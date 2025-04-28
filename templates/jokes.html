@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jokes by Category</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background: linear-gradient(135deg, #FF6F61, #FFD700);
+            color: #333;
+            overflow: hidden;
+            animation: multiColorAnimation 20s infinite;
+        }
+
+        @keyframes multiColorAnimation {
+            0% { background: linear-gradient(135deg, #FF6F61, #FFD700); }
+            25% { background: linear-gradient(135deg, #6A5ACD, #32CD32); }
+            50% { background: linear-gradient(135deg, #32CD32, #1E90FF); }
+            75% { background: linear-gradient(135deg, #FFD700, #FF6F61); }
+            100% { background: linear-gradient(135deg, #FF6F61, #FFD700); }
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 3em;
+            color: white;
+            text-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #categoryDropdown {
+            margin: 20px auto;
+            font-size: 1em;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #6A5ACD;
+            color: white;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #jokeOutput {
+            margin: 20px auto;
+            width: 80%;
+            font-size: 1.4em;
+            line-height: 1.5;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .button {
+            display: inline-block;
+            margin: 15px;
+            padding: 15px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white;
+            background-color: #6A5ACD;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0px 7px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .button:hover {
+            transform: scale(1.2);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #favoritesList {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 15px;
+            width: 80%;
+            margin: 20px auto;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        ul {
+            padding-left: 0;
+        }
+
+        li {
+            list-style-type: none;
+            margin: 5px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            #jokeOutput {
+                font-size: 1.2em;
+                width: 90%;
+                padding: 15px;
+            }
+
+            #categoryDropdown {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+
+            .button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+
+            ul li {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            #jokeOutput {
+                font-size: 1em;
+                width: 95%;
+                padding: 10px;
+            }
+
+            #categoryDropdown {
+                font-size: 0.8em;
+                padding: 6px;
+            }
+
+            .button {
+                padding: 8px 15px;
+                font-size: 0.8em;
+            }
+
+            ul li {
+                font-size: 0.8em;
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Jokes by Category</h1>
+    <p>Select a category and fetch jokes!</p>
+
+    <select id="categoryDropdown">
+        <option value="Any">Any</option>
+        <option value="Programming">Programming</option>
+        <option value="Misc">Miscellaneous</option>
+        <option value="Pun">Pun</option>
+        <option value="Dark">Dark Humor</option>
+        <option value="Roast">Roast</option>
+    </select>
+
+    <p id="jokeOutput">Click "Fetch a Joke" to see a random joke!</p>
+    <button class="button" id="fetchJokeButton">Fetch a Joke</button>
+    <button class="button" id="addToFavoritesButton" disabled>Add to Favorites</button>
+    <button class="button" id="viewFavoritesButton">View Favorites</button>
+
+    <div id="favoritesList" class="hidden">
+        <h2>Your Favorite Jokes</h2>
+        <ul id="favorites"></ul>
+    </div>
+
+    <script>
+        let currentJoke = "";
+        const favorites = JSON.parse(localStorage.getItem("favoriteJokes")) || [];
+
+        document.getElementById("fetchJokeButton").addEventListener("click", () => {
+            const category = document.getElementById("categoryDropdown").value;
+            const jokeOutput = document.getElementById("jokeOutput");
+            jokeOutput.textContent = "Fetching a joke...";
+
+            if (category === "Roast") {
+                const roastJokes = [
+                    "You're like a cloud. When you disappear, it's a beautiful day.",
+                    "You bring everyone so much joy... when you leave the room.",
+                    "I'd agree with you, but then we’d both be wrong.",
+                    "You're proof that even evolution takes a break sometimes."
+                ];
+                const randomRoast = roastJokes[Math.floor(Math.random() * roastJokes.length)];
+                currentJoke = randomRoast;
+                jokeOutput.textContent = randomRoast;
+                document.getElementById("addToFavoritesButton").disabled = false;
+                return;
+            }
+
+            fetch(`https://v2.jokeapi.dev/joke/${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    const joke = data.type === "single" ? data.joke : `${data.setup} - ${data.delivery}`;
+                    currentJoke = joke;
+                    jokeOutput.textContent = joke;
+                    document.getElementById("addToFavoritesButton").disabled = false;
+                })
+                .catch(() => {
+                    jokeOutput.textContent = "Failed to fetch a joke. Please try again.";
+                });
+        });
+
+        document.getElementById("addToFavoritesButton").addEventListener("click", () => {
+            if (currentJoke && !favorites.includes(currentJoke)) {
+                favorites.push(currentJoke);
+                localStorage.setItem("favoriteJokes", JSON.stringify(favorites));
+                alert("Joke added to favorites!");
+                document.getElementById("addToFavoritesButton").disabled = true;
+            }
+        });
+
+        document.getElementById("viewFavoritesButton").addEventListener("click", () => {
+            const favoritesList = document.getElementById("favoritesList");
+            const favoritesElement = document.getElementById("favorites");
+            favoritesElement.innerHTML = "";
+            if (favorites.length === 0) {
+                favoritesElement.innerHTML = "<li>No favorite jokes yet!</li>";
+            } else {
+                favorites.forEach(joke => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = joke;
+                    favoritesElement.appendChild(listItem);
+                });
+            }
+            favoritesList.classList.remove("hidden");
+        });
+    </script>
+</body>
